@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const fileInfo = document.getElementById('fileInfo');
     const uploadForm = document.getElementById('uploadForm');
     const compressBtn = document.getElementById('compressBtn');
+    const targetSizeSelect = document.getElementById('target_size_mb');
+    const customSizeInput = document.getElementById('custom_size');
 
     // Supported file types
     const supportedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/bmp', 'image/tiff'];
@@ -23,19 +25,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Validate file
     function validateFile(file) {
-        if (!file) return { valid: false, error: 'No file selected' };
+        if (!file) return { valid: false, error: 'Tidak ada file yang dipilih' };
         
         if (!supportedTypes.includes(file.type)) {
             return { 
                 valid: false, 
-                error: 'Unsupported file type. Please select a JPEG, PNG, WEBP, BMP, or TIFF image.' 
+                error: 'Tipe file tidak didukung. Silakan pilih gambar JPEG, PNG, WEBP, BMP, atau TIFF.' 
             };
         }
         
         if (file.size > maxFileSize) {
             return { 
                 valid: false, 
-                error: 'File too large. Maximum size is 16MB.' 
+                error: 'File terlalu besar. Ukuran maksimum adalah 50MB.' 
             };
         }
         
@@ -159,10 +161,10 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Show loading state
             compressBtn.disabled = true;
-            compressBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Compressing...';
+            compressBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Mengompres...';
             
             // Show processing message
-            showAlert('Processing your image... Please wait.', 'info');
+            showAlert('Memproses gambar Anda... Mohon tunggu.', 'info');
         });
     }
 
@@ -232,11 +234,26 @@ document.addEventListener('DOMContentLoaded', function() {
         window.addEventListener('beforeunload', function(e) {
             if (compressBtn && compressBtn.disabled && !formSubmitted) {
                 e.preventDefault();
-                e.returnValue = 'Your image is being processed. Are you sure you want to leave?';
+                e.returnValue = 'Gambar Anda sedang diproses. Yakin ingin meninggalkan halaman?';
                 return e.returnValue;
             }
         });
     }
 
-    console.log('Image Compressor: JavaScript initialized successfully');
+    // Custom target size functionality
+    if (customSizeInput && targetSizeSelect) {
+        customSizeInput.addEventListener('input', function() {
+            if (this.value) {
+                targetSizeSelect.value = this.value;
+            }
+        });
+
+        targetSizeSelect.addEventListener('change', function() {
+            if (this.value && this.value !== customSizeInput.value) {
+                customSizeInput.value = '';
+            }
+        });
+    }
+
+    console.log('Kompresi Wlee: JavaScript berhasil diinisialisasi');
 });

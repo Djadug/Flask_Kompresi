@@ -1,7 +1,7 @@
-# Image Compressor Application
+# Kompresi Wlee - Aplikasi Kompresi Gambar
 
 ## Overview
-This is a Flask-based web application for image compression built with Python. The application allows users to upload images and compress them while maintaining visual quality. It features a modern Bootstrap UI with drag-and-drop functionality and real-time file validation.
+Ini adalah aplikasi web berbasis Flask untuk kompresi gambar yang dibangun dengan Python. Aplikasi ini memungkinkan pengguna mengunggah gambar dan mengompresnya sambil mempertahankan kualitas visual. Fitur aplikasi mencakup UI Bootstrap modern dengan fungsionalitas drag-and-drop, validasi file real-time, dan opsi target ukuran kompresi yang dapat disesuaikan.
 
 ## System Architecture
 The application follows a simple Flask web application architecture with the following structure:
@@ -61,7 +61,17 @@ The application is configured for Replit deployment with:
 - **Development**: Hot reload enabled for development workflow
 
 ## Changelog
-- June 17, 2025. Initial setup
+- June 17, 2025: Initial setup
+- June 17, 2025: Updated to Indonesian language interface, changed title to "Kompresi Wlee", increased file limit to 50MB, added target compression size feature, updated footer to "Nico Djadug Apriliano"
+
+## Recent Changes
+- Complete interface translation to Indonesian language
+- Title changed from "Image Compressor" to "Kompresi Wlee"
+- Maximum file upload size increased from 16MB to 50MB
+- Added target compression size selection feature (0.5MB to 10MB presets + custom input)
+- Enhanced compression algorithm with dynamic quality adjustment based on target size
+- Updated footer attribution to "Nico Djadug Apriliano"
+- All user-facing text, error messages, and alerts translated to Indonesian
 
 ## User Preferences
-Preferred communication style: Simple, everyday language.
+Preferred communication style: Simple, everyday language in Indonesian.
