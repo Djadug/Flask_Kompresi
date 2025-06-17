@@ -60,18 +60,5 @@ The application is configured for Replit deployment with:
 - **Process Management**: Parallel workflow execution
 - **Development**: Hot reload enabled for development workflow
 
-## Changelog
-- June 17, 2025: Initial setup
-- June 17, 2025: Updated to Indonesian language interface, changed title to "Kompresi Wlee", increased file limit to 50MB, added target compression size feature, updated footer to "Nico Djadug Apriliano"
-
-## Recent Changes
-- Complete interface translation to Indonesian language
-- Title changed from "Image Compressor" to "Kompresi Wlee"
-- Maximum file upload size increased from 16MB to 50MB
-- Added target compression size selection feature (0.5MB to 10MB presets + custom input)
-- Enhanced compression algorithm with dynamic quality adjustment based on target size
-- Updated footer attribution to "Nico Djadug Apriliano"
-- All user-facing text, error messages, and alerts translated to Indonesian
-
 ## User Preferences
 Preferred communication style: Simple, everyday language in Indonesian.
