@@ -1,0 +1,67 @@
+# Image Compressor Application
+
+## Overview
+This is a Flask-based web application for image compression built with Python. The application allows users to upload images and compress them while maintaining visual quality. It features a modern Bootstrap UI with drag-and-drop functionality and real-time file validation.
+
+## System Architecture
+The application follows a simple Flask web application architecture with the following structure:
+- **Frontend**: HTML templates with Bootstrap 5 styling and vanilla JavaScript
+- **Backend**: Flask web framework with Python 3.11
+- **File Storage**: Local file system storage in `static/uploads/`
+- **Image Processing**: Pillow (PIL) library for image manipulation and compression
+- **Deployment**: Gunicorn WSGI server with autoscale deployment target
+
+## Key Components
+
+### Backend Components
+- **Flask Application** (`app.py`): Main application logic including file upload handling, image compression, and route definitions
+- **Entry Point** (`main.py`): Application entry point that runs the Flask development server
+- **Image Processing**: Uses Pillow library for image compression with configurable quality settings
+- **File Validation**: Supports PNG, JPG, JPEG, WEBP, BMP, and TIFF formats with 16MB size limit
+
+### Frontend Components
+- **Templates**: Jinja2 templates with Bootstrap 5 UI framework
+  - `index.html`: Main upload interface with drag-and-drop functionality
+  - `result.html`: Compression results display with before/after comparison
+- **Static Assets**:
+  - `style.css`: Custom styling with CSS variables and responsive design
+  - `main.js`: Client-side file validation and preview functionality
+- **Upload Directory**: `static/uploads/` for storing original and compressed images
+
+### Configuration
+- **Dependencies**: Managed via `pyproject.toml` with UV lock file
+- **Environment**: Configurable via environment variables (SESSION_SECRET)
+- **Deployment**: Gunicorn production server with reloading capabilities
+- **File Limits**: 16MB maximum file size, multiple image format support
+
+## Data Flow
+1. User uploads image via web interface
+2. Client-side validation checks file type and size
+3. Image preview displayed before compression
+4. Server receives file and validates again
+5. Pillow processes and compresses the image
+6. Compressed image saved to uploads directory
+7. Results page shows compression statistics and download options
+
+## External Dependencies
+- **Flask**: Web framework for HTTP request handling
+- **Pillow**: Image processing and compression library
+- **Werkzeug**: WSGI utilities and secure filename handling
+- **Bootstrap 5**: Frontend CSS framework via CDN
+- **Bootstrap Icons**: Icon library via CDN
+- **Gunicorn**: Production WSGI server
+- **PostgreSQL**: Database packages included but not currently implemented
+
+## Deployment Strategy
+The application is configured for Replit deployment with:
+- **Runtime**: Python 3.11 with Nix package management
+- **Server**: Gunicorn with auto-scaling deployment target
+- **Port Binding**: 0.0.0.0:5000 for external access
+- **Process Management**: Parallel workflow execution
+- **Development**: Hot reload enabled for development workflow
+
+## Changelog
+- June 17, 2025. Initial setup
+
+## User Preferences
+Preferred communication style: Simple, everyday language.

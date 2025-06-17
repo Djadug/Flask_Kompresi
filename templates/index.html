@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Compressor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="bi bi-images"></i> Image Compressor
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-gradient text-white text-center">
+                        <h3 class="mb-0">
+                            <i class="bi bi-cloud-arrow-up"></i> Compress Your Images
+                        </h3>
+                        <p class="mb-0 mt-2">Reduce file size while maintaining quality</p>
+                    </div>
+                    <div class="card-body p-5">
+                        <!-- Flash Messages -->
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                                        <i class="bi bi-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }}"></i>
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="uploadForm">
+                            <div class="mb-4">
+                                <label for="file" class="form-label fw-bold">Select Image File</label>
+                                <div class="upload-area" id="uploadArea">
+                                    <input type="file" class="form-control" id="file" name="file" accept=".png,.jpg,.jpeg,.webp,.bmp,.tiff" required>
+                                    <div class="upload-text">
+                                        <i class="bi bi-cloud-upload display-4 text-muted"></i>
+                                        <p class="mt-2 mb-1">Click to select or drag and drop your image</p>
+                                        <small class="text-muted">Supports: PNG, JPEG, WEBP, BMP, TIFF (Max: 16MB)</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4" id="imagePreview" style="display: none;">
+                                <label class="form-label fw-bold">Preview</label>
+                                <div class="text-center">
+                                    <img id="previewImage" src="" alt="Preview" class="img-fluid rounded shadow" style="max-height: 300px;">
+                                    <div class="mt-2">
+                                        <small id="fileInfo" class="text-muted"></small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <button type="submit" class="btn btn-primary btn-lg w-100" id="compressBtn">
+                                        <i class="bi bi-gear"></i> Compress Image
+                                    </button>
+                                </div>
+                                <div class="col-md-6">
+                                    <a href="{{ url_for('cleanup_files') }}" class="btn btn-outline-secondary btn-lg w-100" onclick="return confirm('This will remove all uploaded files. Continue?')">
+                                        <i class="bi bi-trash"></i> Clear All Files
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="row mt-5">
+                            <div class="col-md-4 text-center mb-3">
+                                <div class="feature-icon">
+                                    <i class="bi bi-lightning-charge text-warning"></i>
+                                </div>
+                                <h5>Fast Processing</h5>
+                                <p class="text-muted">Optimized compression algorithms for quick results</p>
+                            </div>
+                            <div class="col-md-4 text-center mb-3">
+                                <div class="feature-icon">
+                                    <i class="bi bi-shield-check text-success"></i>
+                                </div>
+                                <h5>Quality Preserved</h5>
+                                <p class="text-muted">Maintain visual quality while reducing file size</p>
+                            </div>
+                            <div class="col-md-4 text-center mb-3">
+                                <div class="feature-icon">
+                                    <i class="bi bi-bar-chart text-info"></i>
+                                </div>
+                                <h5>Detailed Stats</h5>
+                                <p class="text-muted">View compression ratio and size comparison</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-light text-center text-muted py-4 mt-5">
+        <div class="container">
+            <p class="mb-0">&copy; 2025 Image Compressor. Built with Flask and Bootstrap 5.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
