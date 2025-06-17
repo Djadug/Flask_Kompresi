@@ -46,102 +46,124 @@ def format_file_size(size_bytes):
         i += 1
     return f"{size_bytes:.1f}{size_names[i]}"
 
-def compress_image(input_path, output_path, quality=85, target_size_mb=None):
+def compress_image(input_path, output_path, quality=75, target_size_mb=None):
     """
     Compress image while maintaining reasonable quality
     Returns compression info dictionary
     """
     try:
-        # Open and process image
         with Image.open(input_path) as img:
-            # Convert RGBA to RGB if necessary (for JPEG compatibility)
-            if img.mode in ('RGBA', 'LA', 'P'):
-                # Create white background
+            # Get original dimensions and size
+            original_width, original_height = img.size
+            original_size = get_file_size(input_path)
+            
+            # Convert to RGB if necessary for better compression
+            if img.mode in ('RGBA', 'LA'):
+                # Create white background for transparency
                 background = Image.new('RGB', img.size, (255, 255, 255))
-                if img.mode == 'P':
-                    img = img.convert('RGBA')
                 background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
                 img = background
+            elif img.mode == 'P':
+                img = img.convert('RGB')
             
-            # Get original dimensions
-            original_width, original_height = img.size
-            
-            # Determine output format based on file extension
+            # Determine output format - force JPEG for better compression
             output_ext = os.path.splitext(output_path)[1].lower()
             
-            # If target size is specified, adjust quality dynamically
+            # For maximum compression, convert PNG/other formats to JPEG
+            if output_ext in ['.png', '.bmp', '.tiff']:
+                output_path = output_path.rsplit('.', 1)[0] + '.jpg'
+                output_ext = '.jpg'
+            
+            # Resize image if it's too large (helps with compression)
+            max_dimension = 2048  # Maximum width or height
+            if max(img.size) > max_dimension:
+                ratio = max_dimension / max(img.size)
+                new_size = (int(img.size[0] * ratio), int(img.size[1] * ratio))
+                img = img.resize(new_size, Image.Resampling.LANCZOS)
+            
+            # Set initial quality based on target size
             if target_size_mb:
                 target_size_bytes = target_size_mb * 1024 * 1024
-                # Start with given quality and adjust if needed
-                current_quality = quality
-                
-                # Try compression with different quality levels
-                for attempt in range(5):  # Maximum 5 attempts
-                    save_kwargs = {'optimize': True}
-                    
-                    if output_ext in ['.jpg', '.jpeg']:
-                        save_kwargs.update({
-                            'format': 'JPEG',
-                            'quality': current_quality,
-                            'progressive': True
-                        })
-                    elif output_ext == '.png':
-                        save_kwargs.update({
-                            'format': 'PNG',
-                            'optimize': True
-                        })
-                    elif output_ext == '.webp':
-                        save_kwargs.update({
-                            'format': 'WEBP',
-                            'quality': current_quality,
-                            'optimize': True
-                        })
-                    
-                    # Save with current settings
-                    img.save(output_path, **save_kwargs)
-                    compressed_size = get_file_size(output_path)
-                    
-                    # Check if we've reached target size
-                    if compressed_size <= target_size_bytes or current_quality <= 20:
-                        break
-                    
-                    # Reduce quality for next attempt
-                    current_quality = max(20, current_quality - 15)
+                # Estimate initial quality based on target size
+                if target_size_bytes < original_size * 0.1:
+                    current_quality = 30
+                elif target_size_bytes < original_size * 0.3:
+                    current_quality = 50
+                else:
+                    current_quality = 70
             else:
-                # Standard compression without target size
-                save_kwargs = {'optimize': True}
-                
-                if output_ext in ['.jpg', '.jpeg']:
-                    save_kwargs.update({
-                        'format': 'JPEG',
-                        'quality': quality,
-                        'progressive': True
-                    })
-                elif output_ext == '.png':
-                    save_kwargs.update({
-                        'format': 'PNG',
-                        'optimize': True
-                    })
-                elif output_ext == '.webp':
-                    save_kwargs.update({
-                        'format': 'WEBP',
-                        'quality': quality,
-                        'optimize': True
-                    })
-                
-                # Save compressed image
-                img.save(output_path, **save_kwargs)
+                current_quality = quality
             
-            # Calculate compression info
-            original_size = get_file_size(input_path)
-            compressed_size = get_file_size(output_path)
-            compression_ratio = ((original_size - compressed_size) / original_size) * 100
+            # Compression with iterative quality adjustment
+            best_quality = current_quality
+            attempts = 0
+            max_attempts = 8
+            
+            while attempts < max_attempts:
+                # Set compression parameters
+                if output_ext in ['.jpg', '.jpeg']:
+                    img.save(output_path, 
+                            format='JPEG',
+                            quality=current_quality,
+                            optimize=True,
+                            progressive=True)
+                elif output_ext == '.webp':
+                    img.save(output_path,
+                            format='WEBP',
+                            quality=current_quality,
+                            optimize=True,
+                            method=6)  # Higher compression method
+                else:
+                    # For other formats, convert to JPEG
+                    output_path = output_path.rsplit('.', 1)[0] + '.jpg'
+                    img.save(output_path,
+                            format='JPEG',
+                            quality=current_quality,
+                            optimize=True,
+                            progressive=True)
+                
+                compressed_size = get_file_size(output_path)
+                
+                # Check if we have a target size
+                if target_size_mb:
+                    if compressed_size <= target_size_bytes:
+                        break
+                    elif current_quality <= 15:
+                        break
+                    else:
+                        # Reduce quality more aggressively
+                        current_quality = max(15, current_quality - 10)
+                else:
+                    # For general compression, ensure we're actually reducing size
+                    if compressed_size < original_size * 0.8:  # At least 20% reduction
+                        break
+                    elif current_quality <= 25:
+                        break
+                    else:
+                        current_quality = max(25, current_quality - 10)
+                
+                attempts += 1
+            
+            # Final check - ensure file was actually compressed
+            final_size = get_file_size(output_path)
+            compression_ratio = ((original_size - final_size) / original_size) * 100
+            
+            # If compression failed to reduce size significantly, try more aggressive approach
+            if compression_ratio < 5 and not target_size_mb:
+                # More aggressive compression
+                img.save(output_path,
+                        format='JPEG',
+                        quality=40,
+                        optimize=True,
+                        progressive=True)
+                final_size = get_file_size(output_path)
+                compression_ratio = ((original_size - final_size) / original_size) * 100
             
             return {
                 'success': True,
                 'original_size': original_size,
-                'compressed_size': compressed_size,
-                'compression_ratio': compression_ratio,
+                'compressed_size': final_size,
+                'compression_ratio': max(compression_ratio, 0),  # Ensure non-negative
                 'original_dimensions': (original_width, original_height),
                 'compressed_dimensions': img.size
             }
