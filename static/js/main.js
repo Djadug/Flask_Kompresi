@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Supported file types
     const supportedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/bmp', 'image/tiff'];
-    const maxFileSize = 16 * 1024 * 1024; // 16MB
+    const maxFileSize = 50 * 1024 * 1024; // 50MB
 
     // File size formatter
     function formatFileSize(bytes) {
